@@ -18,7 +18,7 @@ else {
     $IFS = $IFS.Replace("\n", "`n")
 }
 
-class ifValues {
+class IfValues {
     [string] $OID
     [string] $OIDRegular
     [string] $Name
@@ -57,59 +57,63 @@ class RouteTable {
     [int] $ipCidrRouteStatus
 }
 
-$ipCidrRouteOID = New-Object ifValues
+$ipCidrRouteOID = New-Object IfValues
 $ipCidrRouteOID.Init(".1.3.6.1.2.1.4.24.4.", "ipCidrRouteOID")
 
-$ipCidrRouteDest = New-Object ifValues
+$ipCidrRouteDest = New-Object IfValues
 $ipCidrRouteDest.Init(".1.3.6.1.2.1.4.24.4.1.1.", "ipCidrRouteDest")
 
-$ipCidrRouteMask = New-Object ifValues
+$ipCidrRouteMask = New-Object IfValues
 $ipCidrRouteMask.Init(".1.3.6.1.2.1.4.24.4.1.2.", "ipCidrRouteMask")
 
-$ipCidrRouteTos = New-Object ifValues
+$ipCidrRouteTos = New-Object IfValues
 $ipCidrRouteTos.Init(".1.3.6.1.2.1.4.24.4.1.3.", "ipCidrRouteTos")
 
-$ipCidrRouteNextHop = New-Object ifValues
+$ipCidrRouteNextHop = New-Object IfValues
 $ipCidrRouteNextHop.Init(".1.3.6.1.2.1.4.24.4.1.4.", "ipCidrRouteNextHop")
 
-$ipCidrRouteIfIndex = New-Object ifValues
+$ipCidrRouteIfIndex = New-Object IfValues
 $ipCidrRouteIfIndex.Init(".1.3.6.1.2.1.4.24.4.1.5.", "ipCidrRouteIfIndex")
 
-$ipCidrRouteType = New-Object ifValues
+$ipCidrRouteType = New-Object IfValues
 $ipCidrRouteType.Init(".1.3.6.1.2.1.4.24.4.1.6.", "ipCidrRouteType")
 
-$ipCidrRouteProto = New-Object ifValues
+$ipCidrRouteProto = New-Object IfValues
 $ipCidrRouteProto.Init(".1.3.6.1.2.1.4.24.4.1.7.", "ipCidrRouteProto")
 
-$ipCidrRouteAge = New-Object ifValues
+$ipCidrRouteAge = New-Object IfValues
 $ipCidrRouteAge.Init(".1.3.6.1.2.1.4.24.4.1.8.", "ipCidrRouteAge")
 
-$ipCidrRouteInfo = New-Object ifValues
+$ipCidrRouteInfo = New-Object IfValues
 $ipCidrRouteInfo.Init(".1.3.6.1.2.1.4.24.4.1.9.", "ipCidrRouteInfo")
 
-$ipCidrRouteNextHopAS = New-Object ifValues
+$ipCidrRouteNextHopAS = New-Object IfValues
 $ipCidrRouteNextHopAS.Init(".1.3.6.1.2.1.4.24.4.1.10.", "ipCidrRouteNextHopAS")
 
-$ipCidrRouteMetric1 = New-Object ifValues
+$ipCidrRouteMetric1 = New-Object IfValues
 $ipCidrRouteMetric1.Init(".1.3.6.1.2.1.4.24.4.1.11.", "ipCidrRouteMetric1")
 
-$ipCidrRouteMetric2 = New-Object ifValues
+$ipCidrRouteMetric2 = New-Object IfValues
 $ipCidrRouteMetric2.Init(".1.3.6.1.2.1.4.24.4.1.12.", "ipCidrRouteMetric2")
 
-$ipCidrRouteMetric3 = New-Object ifValues
+$ipCidrRouteMetric3 = New-Object IfValues
 $ipCidrRouteMetric3.Init(".1.3.6.1.2.1.4.24.4.1.13.", "ipCidrRouteMetric3")
 
-$ipCidrRouteMetric4 = New-Object ifValues
+$ipCidrRouteMetric4 = New-Object IfValues
 $ipCidrRouteMetric4.Init(".1.3.6.1.2.1.4.24.4.1.14.", "ipCidrRouteMetric4")
 
-$ipCidrRouteMetric5 = New-Object ifValues
+$ipCidrRouteMetric5 = New-Object IfValues
 $ipCidrRouteMetric5.Init(".1.3.6.1.2.1.4.24.4.1.15.", "ipCidrRouteMetric5")
 
-$ipCidrRouteStatus = New-Object ifValues
+$ipCidrRouteStatus = New-Object IfValues
 $ipCidrRouteStatus.Init(".1.3.6.1.2.1.4.24.4.1.16.", "ipCidrRouteStatus")
 
-$resultTable = @()
-
+$typeTable = @{
+    1 = "other"
+    2 = "reject"
+    3 = "local"
+    4 = "remote"
+}
 
 $protoTable = @{
     1 = "other"
@@ -130,12 +134,7 @@ $protoTable = @{
     16 = "ciscoEigrp"
 }
 
-$typeTable = @{
-    1 = "other"
-    2 = "reject"
-    3 = "local"
-    4 = "remote"
-}
+$resultTable = @()
 
 foreach ($line in $input) {
  #  Write-Output $line
