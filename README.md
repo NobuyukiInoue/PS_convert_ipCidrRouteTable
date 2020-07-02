@@ -11,7 +11,7 @@ after converting it to a table format On PowerShell.
 ## Usage
 
 ```
-> snmpwalk -On -v 2c -c <community> <target_ip> .1.3.6.1.2.1.4.24.4 | .\convert_ipCidrRouteTable.ps1
+> snmpwalk -On -v 2c -c <community> <target_ip> .1.3.6.1.2.1.4.24.4 | .\convert_ipCidrRouteTable.ps1 [IFS(delimiter)]
 ```
 or
 ```
@@ -41,6 +41,24 @@ Destination         Netmask             NextHop             ifIndex   Type      
 10.20.25.254        255.255.255.255     0.0.0.0             20567     local     local     0         170000    .0.0
 10.16.0.0           255.255.255.0       0.0.0.0             99        local     local     0         169996    .0.0
 10.16.0.254         255.255.255.255     0.0.0.0             99        local     local     0         169996    .0.0
+PS D:\PS_convert_ipCidrRouteTable>
+```
+
+## Execution example2(Specify IFS(delimiter) and execute)
+
+```
+> Get-Content .\sample\sample1.txt | .\PS_convert_ipCidrRouteTable.ps1 ","
+Destination,Netmask,NextHop,ifIndex,Type,Proto,Tos,Age,Info
+10.1.15.0,255.255.255.0,0.0.0.0,99,local,local,0,169996,.0.0
+10.1.15.254,255.255.255.255,0.0.0.0,99,local,local,0,169996,.0.0
+10.15.0.0,255.255.255.0,0.0.0.0,99,local,local,0,169996,.0.0
+10.15.0.254,255.255.255.255,0.0.0.0,99,local,local,0,169996,.0.0
+10.15.10.0,255.255.255.0,0.0.0.0,99,local,local,0,169996,.0.0
+10.15.10.254,255.255.255.255,0.0.0.0,99,local,local,0,169996,.0.0
+10.20.25.0,255.255.255.0,0.0.0.0,10501,remote,ospf,0,0,.0.0
+10.20.25.254,255.255.255.255,0.0.0.0,20567,local,local,0,170000,.0.0
+10.16.0.0,255.255.255.0,0.0.0.0,99,local,local,0,169996,.0.0
+10.16.0.254,255.255.255.255,0.0.0.0,99,local,local,0,169996,.0.0
 PS D:\PS_convert_ipCidrRouteTable>
 ```
 
