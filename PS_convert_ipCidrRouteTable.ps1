@@ -3,7 +3,7 @@
 ## after converting it to a table format.
 ##
 ## Usage)
-## snmpwalk -On -v 2c -c <community> <target_ip> .1.3.6.1.2.1.4.24.4 | ./convert_ipCidrRouteTable.ps1
+## snmpwalk -On -v 2c -c <community> <target_ip> .1.3.6.1.2.1.4.24.4 | ./convert_ipCidrRouteTable.ps1 [$IFS(Separator)]
 ##------------------------------------------------------------------------------------------------##
 param($IFS)
 
@@ -36,19 +36,25 @@ class RouteTable {
     [string] $ipCidrRouteOID
     [string] $ipCidrRouteDest
     [string] $ipCidrRouteMask
-    [string] $ipCidrRouteTos
+    [int] $ipCidrRouteTos
     [string] $ipCidrRouteNextHop
-    [string] $ipCidrRouteIfIndex
-    [string] $ipCidrRouteType
-    [string] $ipCidrRouteProto
-    [string] $ipCidrRouteAge
+    [int] $ipCidrRouteIfIndex
+
+    [int] $ipCidrRouteType
+    [string] $ipCidrRouteTypeName
+
+    [int] $ipCidrRouteProto
+    [string] $ipCidrRouteProtoName
+
+    [int] $ipCidrRouteAge
     [string] $ipCidrRouteInfo
-    [string] $ipCidrRouteNextHopAS
-    [string] $ipCidrRouteMetric2
-    [string] $ipCidrRouteMetric3
-    [string] $ipCidrRouteMetric4
-    [string] $ipCidrRouteMetric5
-    [string] $ipCidrRouteStatus
+    [int] $ipCidrRouteNextHopAS
+    [int] $ipCidrRouteMetric1
+    [int] $ipCidrRouteMetric2
+    [int] $ipCidrRouteMetric3
+    [int] $ipCidrRouteMetric4
+    [int] $ipCidrRouteMetric5
+    [int] $ipCidrRouteStatus
 }
 
 $ipCidrRouteOID = New-Object ifValues
@@ -84,6 +90,9 @@ $ipCidrRouteInfo.Init(".1.3.6.1.2.1.4.24.4.1.9.", "ipCidrRouteInfo")
 $ipCidrRouteNextHopAS = New-Object ifValues
 $ipCidrRouteNextHopAS.Init(".1.3.6.1.2.1.4.24.4.1.10.", "ipCidrRouteNextHopAS")
 
+$ipCidrRouteMetric1 = New-Object ifValues
+$ipCidrRouteMetric1.Init(".1.3.6.1.2.1.4.24.4.1.11.", "ipCidrRouteMetric1")
+
 $ipCidrRouteMetric2 = New-Object ifValues
 $ipCidrRouteMetric2.Init(".1.3.6.1.2.1.4.24.4.1.12.", "ipCidrRouteMetric2")
 
@@ -100,6 +109,33 @@ $ipCidrRouteStatus = New-Object ifValues
 $ipCidrRouteStatus.Init(".1.3.6.1.2.1.4.24.4.1.16.", "ipCidrRouteStatus")
 
 $resultTable = @()
+
+
+$protoTable = @{
+    1 = "other"
+    2 = "local"
+    3 = "netmgmt"
+    4 = "icmp"
+    5 = "egp"
+    6 = "ggp"
+    7 = "hello"
+    8 = "rip"
+    9 = "isIs"
+    10 = "esIs"
+    11 = "ciscoIgrp"
+    12 = "bbnSpfIgp"
+    13 = "ospf"
+    14 = "bgp"
+    15 = "idpr"
+    16 = "ciscoEigrp"
+}
+
+$typeTable = @{
+    1 = "other"
+    2 = "reject"
+    3 = "local"
+    4 = "remote"
+}
 
 foreach ($line in $input) {
  #  Write-Output $line
@@ -176,14 +212,41 @@ foreach ($line in $input) {
             }
             break
         }
+        $ipCidrRouteAge.OIDRegular {
+            $line = $line.Replace($ipCidrRouteAge.OID, "")
+            $flds = $line -split " = "
+            if (($flds.Length -ge 2) -And ($flds[0] -eq $resultTable[$ipCidrRouteAge.count].ipCidrRouteOID)) {
+                $resultTable[$ipCidrRouteAge.count].ipCidrRouteAge = $flds[1].Replace("INTEGER: ", "")
+                $ipCidrRouteAge.count++
+            }
+            break
+        }
+        $ipCidrRouteInfo.OIDRegular {
+            $line = $line.Replace($ipCidrRouteInfo.OID, "")
+            $flds = $line -split " = "
+            if (($flds.Length -ge 2) -And ($flds[0] -eq $resultTable[$ipCidrRouteInfo.count].ipCidrRouteOID)) {
+                $resultTable[$ipCidrRouteInfo.count].ipCidrRouteInfo = $flds[1].Replace("OID: ", "")
+                $ipCidrRouteInfo.count++
+            }
+            break
+        }
     }
 }
 
 if ($IFS -eq "") {
-    $format = "{0,-20}{1,-20}{2,-20}{3,-10}{4,-10}{5,-10}{6,-10}"
+    $format = "{0,-20}{1,-20}{2,-20}{3,-10}{4,-10}{5,-10}{6,-10}{7,-10}{8,-10}"
 }
 else {
-    $format = "{0}$IFS{1}$IFS{2}$IFS{3}$IFS{4}$IFS{5}$IFS{6}"
+    $format = "{0}$IFS{1}$IFS{2}$IFS{3}$IFS{4}$IFS{5}$IFS{6}$IFS{7}$IFS{8}"
+}
+
+
+for ($i = 0; $i -lt $resultTable.Length; $i++) {
+    $resultTable[$i].ipCidrRouteTypeName = $typeTable[$resultTable[$i].ipCidrRouteType]
+}
+
+for ($i = 0; $i -lt $resultTable.Length; $i++) {
+    $resultTable[$i].ipCidrRouteProtoName = $protoTable[$resultTable[$i].ipCidrRouteProto]
 }
 
 
@@ -195,8 +258,8 @@ Write-Output ($format -f `
   , "Type" `
   , "Proto" `
   , "Tos" `
-#  , "Age" `
-#  , "Info" `
+  , "Age" `
+  , "Info" `
 )
 
 for ($i = 0; $i -lt $resultTable.Length; $i++) {
@@ -205,10 +268,10 @@ for ($i = 0; $i -lt $resultTable.Length; $i++) {
     , $resultTable[$i].ipCidrRouteMask `
     , $resultTable[$i].ipCidrRouteNextHop `
     , $resultTable[$i].ipCidrRouteIfIndex `
-    , $resultTable[$i].ipCidrRouteType `
-    , $resultTable[$i].ipCidrRouteProto `
+    , $resultTable[$i].ipCidrRouteTypeName `
+    , $resultTable[$i].ipCidrRouteProtoName `
     , $resultTable[$i].ipCidrRouteTos `
-#    , $resultTable[$i].ipCidrRouteAge `
-#    , $resultTable[$i].ipCidrRouteInfo `
+    , $resultTable[$i].ipCidrRouteAge `
+    , $resultTable[$i].ipCidrRouteInfo `
     )
 }

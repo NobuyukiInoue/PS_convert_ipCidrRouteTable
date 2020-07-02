@@ -1,0 +1,35 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell: Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}"
+        },
+        {
+            "name": "PowerShell: Launch Current File(main.ps1)",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "./main.ps1",
+            "cwd": "./main.ps1",
+            "args":[
+                "10.15.10.254",
+                "public"
+            ]
+        }
+        /*
+        ,{
+            "name": "PowerShell: Launch Current File(Get-Content sample/sample1.txt)",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Get-Content .\\sample\\sample1.txt | .\\PS_convert_ipCidrRouteTable.ps1",
+            "cwd": "Get-Content .\\sample\\sample1.txt | .\\PS_convert_ipCidrRouteTable.ps1"
+        }
+        */
+    ]
+}
